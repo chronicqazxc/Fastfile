@@ -1,0 +1,2 @@
+gem "fastlane-plugin-unzip", git: "https://github.com/maxoly/fastlane-plugin-unzip"
+gem 'fastlane-plugin-google_drive'

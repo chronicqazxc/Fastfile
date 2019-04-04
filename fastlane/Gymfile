@@ -1,0 +1,4 @@
+scheme("xxx")
+workspace("xxx.xcworkspace")
+clean(true)
+output_name("xxx")
