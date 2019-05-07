@@ -17,9 +17,15 @@
 	<key>CFBundleShortVersionString</key>
 	<string>1.0</string>
 	<key>CFBundleVersion</key>
-	<string>1</string>
+	<string>20190507.1</string>
+	<key>Environment</key>
+	<string>Default</string>
 	<key>LSRequiresIPhoneOS</key>
 	<true/>
+	<key>NewRelicAppVersionString</key>
+	<string>1.0</string>
+	<key>NewRelicBuildTagString</key>
+	<string>20190507.1</string>
 	<key>UILaunchStoryboardName</key>
 	<string>LaunchScreen</string>
 	<key>UIMainStoryboardFile</key>

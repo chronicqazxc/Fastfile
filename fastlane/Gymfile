@@ -1,4 +1,3 @@
-scheme("xxx")
-workspace("xxx.xcworkspace")
+scheme("FastfileTest")
 clean(true)
-output_name("xxx")
+#workspace("FastfileTest.xcworkspace")

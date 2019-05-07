@@ -22,6 +22,17 @@
 		A616D58B225607E3006F14F6 /* Assets.xcassets */ = {isa = PBXFileReference; lastKnownFileType = folder.assetcatalog; path = Assets.xcassets; sourceTree = "<group>"; };
 		A616D58E225607E3006F14F6 /* Base */ = {isa = PBXFileReference; lastKnownFileType = file.storyboard; name = Base; path = Base.lproj/LaunchScreen.storyboard; sourceTree = "<group>"; };
 		A616D590225607E3006F14F6 /* Info.plist */ = {isa = PBXFileReference; lastKnownFileType = text.plist.xml; path = Info.plist; sourceTree = "<group>"; };
+		A6B4F0BA2281721D00A8CA40 /* Gymfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; path = Gymfile; sourceTree = "<group>"; };
+		A6B4F0BB2281721D00A8CA40 /* ShellScript.rb */ = {isa = PBXFileReference; lastKnownFileType = text.script.ruby; path = ShellScript.rb; sourceTree = "<group>"; };
+		A6B4F0BC2281721D00A8CA40 /* Pluginfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; path = Pluginfile; sourceTree = "<group>"; };
+		A6B4F0BD2281721D00A8CA40 /* HockeyApp.rb */ = {isa = PBXFileReference; lastKnownFileType = text.script.ruby; path = HockeyApp.rb; sourceTree = "<group>"; };
+		A6B4F0BE2281721D00A8CA40 /* Fastfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; path = Fastfile; sourceTree = "<group>"; };
+		A6B4F0C02281721D00A8CA40 /* GoogleDrive.rb */ = {isa = PBXFileReference; lastKnownFileType = text.script.ruby; path = GoogleDrive.rb; sourceTree = "<group>"; };
+		A6B4F0C22281721D00A8CA40 /* Plist.rb */ = {isa = PBXFileReference; lastKnownFileType = text.script.ruby; path = Plist.rb; sourceTree = "<group>"; };
+		A6B4F0C32281727700A8CA40 /* README.md */ = {isa = PBXFileReference; lastKnownFileType = net.daringfireball.markdown; path = README.md; sourceTree = "<group>"; };
+		A6B4F0C4228172A200A8CA40 /* .env */ = {isa = PBXFileReference; lastKnownFileType = text; path = .env; sourceTree = "<group>"; };
+		A6B4F0C5228177A700A8CA40 /* UITest.rb */ = {isa = PBXFileReference; lastKnownFileType = text.script.ruby; path = UITest.rb; sourceTree = "<group>"; };
+		A6B4F0C6228183C100A8CA40 /* Gemfile */ = {isa = PBXFileReference; explicitFileType = text.script.ruby; path = Gemfile; sourceTree = "<group>"; };
 /* End PBXFileReference section */
 
 /* Begin PBXFrameworksBuildPhase section */
@@ -38,6 +49,9 @@
 		A616D578225607E0006F14F6 = {
 			isa = PBXGroup;
 			children = (
+				A6B4F0C32281727700A8CA40 /* README.md */,
+				A6B4F0C6228183C100A8CA40 /* Gemfile */,
+				A6B4F0B92281721D00A8CA40 /* fastlane */,
 				A616D583225607E0006F14F6 /* FastfileTest */,
 				A616D582225607E0006F14F6 /* Products */,
 			);
@@ -62,6 +76,22 @@
 				A616D590225607E3006F14F6 /* Info.plist */,
 			);
 			path = FastfileTest;
+			sourceTree = "<group>";
+		};
+		A6B4F0B92281721D00A8CA40 /* fastlane */ = {
+			isa = PBXGroup;
+			children = (
+				A6B4F0C4228172A200A8CA40 /* .env */,
+				A6B4F0BA2281721D00A8CA40 /* Gymfile */,
+				A6B4F0BB2281721D00A8CA40 /* ShellScript.rb */,
+				A6B4F0BC2281721D00A8CA40 /* Pluginfile */,
+				A6B4F0C5228177A700A8CA40 /* UITest.rb */,
+				A6B4F0BD2281721D00A8CA40 /* HockeyApp.rb */,
+				A6B4F0BE2281721D00A8CA40 /* Fastfile */,
+				A6B4F0C02281721D00A8CA40 /* GoogleDrive.rb */,
+				A6B4F0C22281721D00A8CA40 /* Plist.rb */,
+			);
+			path = fastlane;
 			sourceTree = "<group>";
 		};
 /* End PBXGroup section */
@@ -96,6 +126,8 @@
 				TargetAttributes = {
 					A616D580225607E0006F14F6 = {
 						CreatedOnToolsVersion = 10.1;
+						DevelopmentTeam = 94MBHXKUB6;
+						ProvisioningStyle = Manual;
 					};
 				};
 			};
@@ -282,7 +314,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Yu Han Hsiao (94MBHXKUB6)";
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = 94MBHXKUB6;
 				INFOPLIST_FILE = FastfileTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -291,6 +324,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.wayne.FastfileTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "4e378813-4328-4c68-9d10-734610714abd";
+				PROVISIONING_PROFILE_SPECIFIER = Wayne.AppStore;
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};
@@ -300,7 +335,8 @@
 			isa = XCBuildConfiguration;
 			buildSettings = {
 				ASSETCATALOG_COMPILER_APPICON_NAME = AppIcon;
-				CODE_SIGN_STYLE = Automatic;
+				CODE_SIGN_IDENTITY = "iPhone Distribution: Yu Han Hsiao (94MBHXKUB6)";
+				CODE_SIGN_STYLE = Manual;
 				DEVELOPMENT_TEAM = 94MBHXKUB6;
 				INFOPLIST_FILE = FastfileTest/Info.plist;
 				LD_RUNPATH_SEARCH_PATHS = (
@@ -309,6 +345,8 @@
 				);
 				PRODUCT_BUNDLE_IDENTIFIER = com.wayne.FastfileTest;
 				PRODUCT_NAME = "$(TARGET_NAME)";
+				PROVISIONING_PROFILE = "4e378813-4328-4c68-9d10-734610714abd";
+				PROVISIONING_PROFILE_SPECIFIER = Wayne.AppStore;
 				SWIFT_VERSION = 4.2;
 				TARGETED_DEVICE_FAMILY = "1,2";
 			};

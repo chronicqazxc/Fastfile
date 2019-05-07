@@ -1,2 +1,5 @@
 .bundle/
 vendor/
+FastlaneBuilds/
+vendor/
+DerivedData/

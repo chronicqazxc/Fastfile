@@ -1,5 +1,5 @@
 
-def update_plist(keysValues, path = "./ABC/ABC-Info.plist")
+def update_plist(keysValues, path = "./FastfileTest/Info.plist")
     update_info_plist(plist_path: path,
                       block: lambda { |plist|
                       keysValues.each do |key, value|

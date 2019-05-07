@@ -1,2 +1,4 @@
-gem "fastlane-plugin-unzip", git: "https://github.com/maxoly/fastlane-plugin-unzip"
+
+gem 'fastlane-plugin-unzip'
 gem 'fastlane-plugin-google_drive'
+gem 'dotenv-rails', groups: [:test, :development], require: 'dotenv/rails-now'

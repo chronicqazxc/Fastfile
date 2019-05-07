@@ -10,96 +10,81 @@ import("./GoogleDrive.rb")
 import("./HockeyApp.rb")
 import("./Plist.rb")
 import("./ShellScript.rb")
+import("./UITest.rb")
+fastlane_require "colorize"
 
 module Constant
+    module PRODUCT_NAME
+        BASE = "FastfileTest"
+        NOTIFICATION_CONTENT_EXTENSION = ""
+        NOTIFICATION_SERVICE_EXTENSION = ""
+    end
     BUILD_NUMBER = "1"
     OUT_PUT = "../#{BUILD_NUMBER}"
     IS_THIN = "none"
     TODAY = DateTime.now.strftime("%Y%m%d")
     DERIVEDDATAPATH = "../DerivedData"
-    XCODEVERSION = "10.1"
+#    XCODEVERSION = "10.1"
 
     module SDK
         SIMULATOR = "iphonesimulator12.1"
-        IPHONE = "iphoneos12.1"
+        IPHONE = "iphoneos12.2"
     end
-
-    module BundleId
-        DEV = "com.abcCompany.abcCompanyland.dev"
-        DIQA = "com.abcCompany.abcCompanyland"
-        ADHOC = "com.abcCompany.abcCompanyland"
-        INGESTION = "com.prediqa.ingestion"
+    
+    module BundleID
+        module BASE
+            DEV = "com.wayne.FastfileTest"
+            PRODUCTION = "com.wayne.FastfileTest"
+        end
+        module NOTIFICATION_CONTENT_EXTENSION
+            DEV = "com.wayne.FastfileTest"
+            PRODUCTION = "com.wayne.FastfileTest"
+        end
+        module NOTIFICATION_SERVICE_EXTENSION
+            DEV = "com.wayne.FastfileTest"
+            PRODUCTION = "com.wayne.FastfileTest"
+        end
     end
-
+    
+    module TeamID
+        DEV = "94MBHXKUB6"
+        PRODUCTION = "94MBHXKUB6"
+    end
+    
     module SingingIdentity
-        DEV = "iPhone Distribution: abcCompany Online"
-        DIQA = "iPhone Distribution: abcCompany Electronic Content, Inc. ()"
-        ADHOC = "iPhone Distribution: abcCompany Electronic Content, Inc. ()"
-        INGESTION = "iPhone Distribution: Yu Han Hsiao ()"
+        DEV = "iPhone Distribution: Yu Han Hsiao (94MBHXKUB6)"
+        PRODUCTION = "iPhone Distribution: Yu Han Hsiao (94MBHXKUB6)"
     end
-
+    
     module ProvisioningProfile
-        module DEV
-            module Identity
-                BASE = "com.abcCompany.abcCompanyland.dev"
-                NOTIFICATION_CONTENT_EXTENSION = "com.abcCompany.abcCompanyland.dev.NotificationContentExtension"
-                NOTIFICATION_SERVICE_EXTENSION = "com.abcCompany.abcCompanyland.dev.NotificationServiceExtension"
-            end
+        module BASE
             module UUID
-                BASE = ""
-                NOTIFICATION_CONTENT_EXTENSION = ""
-                NOTIFICATION_SERVICE_EXTENSION = ""
-            end
-        end
-        module DIQA
-            module Identity
-                BASE = "com.abcCompany.abcCompanyland"
-                NOTIFICATION_CONTENT_EXTENSION = "com.abcCompany.abcCompanyland.NotificationContentExtension"
-                NOTIFICATION_SERVICE_EXTENSION = "com.abcCompany.abcCompanyland.NotificationServiceExtension"
-            end
-            module UUID
-                BASE = ""
-                NOTIFICATION_CONTENT_EXTENSION = ""
-                NOTIFICATION_SERVICE_EXTENSION = ""
+                DEV = "48de5cc5-fd4f-4215-b458-40b779d74c47"
+                PRODUCTION = "4e378813-4328-4c68-9d10-734610714abd"
             end
             module NAME
-                BASE = "abcCompanyland_app_store_distribution"
-                NOTIFICATION_CONTENT_EXTENSION = "ABCNotificationContentExtension_app_store_distrib"
-                NOTIFICATION_SERVICE_EXTENSION = "ABCNotificationServiceExtension_app_store_distrib"
+                DEV = "Wayne.AdHoc"
+                PRODUCTION = "Wayne.AppStore"
             end
         end
-        module ADHOC
-            module Identity
-                BASE = "com.abcCompany.abcCompanyland"
-                NOTIFICATION_CONTENT_EXTENSION = "com.abcCompany.abcCompanyland.NotificationContentExtension"
-                NOTIFICATION_SERVICE_EXTENSION = "com.abcCompany.abcCompanyland.NotificationServiceExtension"
-            end
+        module NOTIFICATION_CONTENT_EXTENSION
             module UUID
-                BASE = ""
-                NOTIFICATION_CONTENT_EXTENSION = ""
-                NOTIFICATION_SERVICE_EXTENSION = ""
+                DEV = ""
+                PRODUCTION = ""
             end
             module NAME
-                BASE = "abcCompanyland_adhoc_distribution"
-                NOTIFICATION_CONTENT_EXTENSION = "ABCNotificationContentExtension_adhoc_distributio"
-                NOTIFICATION_SERVICE_EXTENSION = "ABCNotificationServiceExtension_adhoc_distrib"
+                DEV = ""
+                PRODUCTION = ""
             end
         end
-        module INGESTION
-            module Identity
-                BASE = "com.prediqa.ingestion"
-                NOTIFICATION_CONTENT_EXTENSION = "com.prediqa.ingestion.NotificationContentExtension"
-                NOTIFICATION_SERVICE_EXTENSION = "com.prediqa.ingestion.NotificationServiceExtension"
-            end
+        module NOTIFICATION_SERVICE_EXTENSION
             module UUID
-                BASE = ""
-                NOTIFICATION_CONTENT_EXTENSION = ""
-                NOTIFICATION_SERVICE_EXTENSION = ""
+                DEV = ""
+                PRODUCTION = ""
             end
             module NAME
-                BASE = "abcCompanyland_adhoc_distribution"
-                NOTIFICATION_CONTENT_EXTENSION = "ABCNotificationContentExtension_adhoc_distributio"
-                NOTIFICATION_SERVICE_EXTENSION = "ABCNotificationServiceExtension_adhoc_distrib"
+                DEV = ""
+                PRODUCTION = ""
             end
         end
     end
@@ -111,274 +96,275 @@ output = "../#{build_number}"
 is_thin = "none"
 today = DateTime.now
 today = today.strftime("%Y%m%d")
-derivedDataPath = "../DerivedData"
+derivedDataPath = "./DerivedData"
+isCompileBitcode = true
 
 default_platform(:ios)
 
 before_all do |lane, options|
-    xcversion(version: "#{Constant::XCODEVERSION}")
-
+    build_number = options[:build_number] ? options[:build_number] : "1"
+#    xcversion(version: "#{Constant::XCODEVERSION}")
+    isCompileBitcode = options[:is_compile_bitcode] == false ? false : true
+    
     if options[:is_clean_derivedData] == true ? true : false
         clean_derivedData
     end
-
-    if options[:build_number]
-        build_number = "#{today}.#{options[:build_number]}"
-        case lane
-            when :dev
-                output = "../FastlaneBuilds/dev/#{build_number}"
-            when :rc
-                output = "../FastlaneBuilds/rc/#{build_number}"
-            when :diqa
-                output = "../FastlaneBuilds/diqa/#{build_number}"
-            when :simulator
-                output = "../FastlaneBuilds/simulator/#{build_number}"
-            else
-
-        end
+    
+    build_number = "#{today}.#{build_number}"
+    case lane
+        when :dev
+        output = "./FastlaneBuilds/dev/#{build_number}"
+        when :app_store
+        output = "./FastlaneBuilds/app_store/#{build_number}"
+        when :simulator
+        output = "./FastlaneBuilds/simulator/#{build_number}"
+        else
+        
     end
-
+    
     if options[:is_thin] == true ? true : false
         is_thin = "thin-for-all-variants"
-    else
+        else
         is_thin = "none"
     end
 end
 
 platform :ios do
-  # Build Steps
-  # 1. Select Xcode version
-  # 2. Update Dependencies
-  # 3. Update Info.plist (NewRelic, Env)
-  # 4. Increase build number
-  # 5. Update bundle ID
-  # 6. Update Xcode project team
-  # 7. Code sign
-  # 8. Archive & Export
-
-  desc "Simulator build"
-  lane :simulator do |options|
-
-      is_clean_carthage_cache = options[:is_clean_carthage_cache] == true ? true : false
-      updateAppVersion(options[:app_version])
-      if options[:is_update_dependencies] == true ? true : false
-          update_dependencies(isDebug: true, isCleanCache: is_clean_carthage_cache)
-      end
-
-      if options[:is_export] == true ? true : false
-          cocoapods(repo_update: false)
-          version = get_version_number(target: "ABC")
-          update_plist ({
-                        "NewRelicAppVersionString" => "#{version}-DEV",
-                        "NewRelicBuildTagString" => build_number,
-                        "Environment" => "Stage/AliCloud"
-                        })
-          increment_build_number(build_number: build_number)
-          update_bundle_id "com.abcCompany.abcCompanyland.dev"
-          update_project_team(teamid: "86BD45EKTC")
-          code_sign_dev
-          xcodebuild(
-            scheme: "ABC",
-            workspace: "./MyProject.xcworkspace",
-            derivedDataPath: derivedDataPath,
-            sdk: "#{Constant::SDK::SIMULATOR}",
-            arch: "x86_64",
-            xcargs: "-configuration Debug clean build"
-          )
-
-          productsRootPath = File.expand_path("../#{derivedDataPath}/Build/Products/Debug-iphonesimulator")
-          outputRootPath = File.expand_path("../#{output}")
-
-          if !File.exist? ("#{outputRootPath}")
-            FileUtils.mkdir_p ("#{outputRootPath}")
-          end
-
-          if File.exist? ("#{productsRootPath}/ABC.app")
-            File.rename("#{productsRootPath}/ABC.app", "#{outputRootPath}/ABC.app")
-            zip(path: "#{outputRootPath}/ABC.app", output_path: "#{outputRootPath}/ABC.app.zip")
-          else
-            puts "ABC.app not found"
-          end
-
-          if File.exist? ("#{productsRootPath}/ABC.app.dSYM")
-            File.rename("#{productsRootPath}/ABC.app.dSYM", "#{outputRootPath}/ABC.app.dSYM")
-          else
-            puts "ABC.app.dSYM not found"
-          end
-      end
-  end
-
-  desc "Dev build"
-  lane :dev do |options|
-
-      is_clean_carthage_cache = options[:is_clean_carthage_cache] == true ? true : false
-      updateAppVersion(options[:app_version])
-      if options[:is_update_dependencies] == true ? true : false
-          update_dependencies(isDebug: true, isCleanCache: is_clean_carthage_cache)
-      end
-
-      if options[:is_export] == true ? true : false
-          cocoapods(repo_update: true)
-          version = get_version_number(target: "ABC")
-          update_plist ({
-                        "NewRelicAppVersionString" => "#{version}-DEV",
-                        "NewRelicBuildTagString" => build_number,
-                        "Environment" => "Stage/xxxEnv"
-                        })
-          increment_build_number(build_number: build_number)
-          update_bundle_id "com.abcCompany.abcCompanyland.dev"
-          update_project_team(teamid: "")
-          code_sign_dev
-          ipa_path = gym(configuration: "Debug",
-                          output_directory: output,
-                          sdk: "#{Constant::SDK::IPHONE}",
-                          archive_path: "#{output}/ABC",
-                          clean:true,
-                          derived_data_path: derivedDataPath,
-                          export_options:{compileBitcode: true,
-                          method: "enterprise",
-                          signingCertificate: "iPhone Distribution",
-                          signingStyle: "manual",
-                          stripSwiftSymbols: true,
-                          teamID: "",
-                          provisioningProfiles: {"com.abcCompany.abcCompanyland.dev" => "ABC HockeyApp Distribution"},
-                          thinning: "<#{is_thin}>"
+    
+    lane :syntax_test do
+        #UI.message(build_number)
+        #version = get_version_number(target: "")
+        #update_plist ({
+        #  "NewRelicAppVersionString" => "#{version}-DEV",
+        #  "NewRelicBuildTagString" => build_number,
+        #  "Environment" => "Stage/AliCloud"
+        #})
+    end
+    
+    desc "Help to understand usage of iOS lanes."
+    lane :help do
+        puts <<-eos
+        
+        simulator
+        1. is_clean_carthage_cache - optional default: false
+        2. app_version - opitonal
+        3. is_update_dependencies - optional default: false
+        4. is_export - optional default: false
+        5. is_clean_derivedData - optional default: false
+        6. build_number - optional default: 1
+        
+        Dev build
+        1. is_clean_carthage_cache - optional default: false
+        2. app_version - opitonal
+        3. is_update_dependencies - optional default: false
+        4. is_export - optional default: false
+        5. is_upload_to_hockeyapp - optional default: false
+        6. is_compile_bitcode - optional default: true
+        7. is_clean_derivedData - optional default: false
+        8. build_number - optional default: 1
+        9. is_thin - optional default: false
+        
+        DIQA
+        1. is_clean_carthage_cache - optional default: false
+        2. app_version - opitonal
+        3. is_update_dependencies - optional default: false
+        4. is_export - optional default: false
+        5. is_upload_to_googledrive - optional default: false
+        6. is_compile_bitcode - optional default: true
+        7. is_clean_derivedData - optional default: false
+        8. build_number - optional default: 1
+        
+        Re-sign build
+        1. path - required: ipa path
+        2. type - required: dev / ad_hoc / ingestion
+        
+        monkey_test
+        1. duration - optional: Duration of the test. default: 60 seconds
+        2. device - optional: Device the test runing on. default: iPhone SE
+        3. prepareInterval - optional: You can set preparation time for indicate to specific feature. default: 0
+        4. isShowPaws - optional: Whether to display monkey paws. default: true
+        
+        eos
+    end
+    
+    # Build Steps
+    # 1. Select Xcode version
+    # 2. Update Dependencies
+    # 3. Update Info.plist (NewRelic, Env)
+    # 4. Increase build number
+    # 5. Update bundle ID
+    # 6. Update Xcode project team
+    # 7. Code sign
+    # 8. Archive & Export
+    
+    desc "Simulator build"
+    lane :simulator do |options|
+        
+        is_clean_carthage_cache = options[:is_clean_carthage_cache] == true ? true : false
+        updateAppVersion(options[:app_version])
+        if options[:is_update_dependencies] == true ? true : false
+            update_dependencies(isDebug: true, isCleanCache: is_clean_carthage_cache)
+        end
+        
+        if options[:is_export] == true ? true : false
+#            cocoapods(repo_update: false)
+            version = get_version_number(target: Constant::PRODUCT_NAME::BASE)
+            update_plist ({
+                          "NewRelicAppVersionString" => "#{version}-DEV",
+                          "NewRelicBuildTagString" => build_number,
+                          "Environment" => "Stage"
                           })
-
-          if options[:is_upload_to_hockeyapp] == true ? true : false
-              upload_to_hockeyapp_dev(ipa_path)
-          end
-      end
-
-
-  end
-
-  desc "RC build"
-  lane :rc do |options|
-
-      is_clean_carthage_cache = options[:is_clean_carthage_cache] == true ? true : false
-      updateAppVersion(options[:app_version])
-      if options[:is_update_dependencies] == true ? true : false
-          update_dependencies(isCleanCache: is_clean_carthage_cache)
-      end
-
-      if options[:is_export] == true ? true : false
-          cocoapods(repo_update: true)
-          version = get_version_number(target: "ABC")
-          update_plist ({
-                        "NewRelicAppVersionString" => "#{version}-RC",
-                        "NewRelicBuildTagString" => build_number,
-                        "Environment" => "Default"
-                        })
-          increment_build_number(build_number: build_number)
-          update_bundle_id "com.abcCompany.abcCompanyland.dev"
-          code_sign_rc
-          ipa_path = gym(configuration: "Release",
-                          output_directory: output,
-                          sdk: "#{Constant::SDK::IPHONE}",
-                          archive_path: "#{output}/ABC",
-                          clean:true,
-                          derived_data_path: derivedDataPath,
-                          export_options:{compileBitcode: true,
-                          method: "enterprise",
-                          signingCertificate: "iPhone Distribution",
-                          signingStyle: "manual",
-                          stripSwiftSymbols: true,
-                          teamID: "",
-                          provisioningProfiles: {"com.abcCompany.abcCompanyland.dev" => "ABC HockeyApp Distribution"},
-                          thinning: "<#{is_thin}>"
+            increment_build_number(build_number: build_number)
+            update_bundle_id Constant::BundleID::BASE::DEV
+            update_project_team(teamid: Constant::TeamID::DEV)
+#           code_sign_dev
+            xcodebuild(
+                       scheme: Constant::PRODUCT_NAME::BASE,
+#                      workspace: "./FastfileTest.xcworkspace",
+                       derivedDataPath: derivedDataPath,
+                       arch: "x86_64",
+                       xcargs: "-sdk iphonesimulator -configuration Debug clean build"
+                       )
+                                     
+            productsRootPath = File.expand_path("../#{derivedDataPath}/Build/Products/Debug-iphonesimulator")
+            outputRootPath = File.expand_path("../#{output}")
+                                     
+            if !File.exist? ("#{outputRootPath}")
+                FileUtils.mkdir_p ("#{outputRootPath}")
+            end
+                                     
+            if File.exist? ("#{productsRootPath}/#{Constant::PRODUCT_NAME::BASE}.app")
+                fileName = "#{Constant::PRODUCT_NAME::BASE}_#{version}(#{build_number})_simulator"
+                File.rename("#{productsRootPath}/#{Constant::PRODUCT_NAME::BASE}.app", "#{outputRootPath}/#{fileName}.app")
+                zip(path: "#{outputRootPath}/#{fileName}.app", output_path: "#{outputRootPath}/#{fileName}.zip")
+            else
+                puts "#{Constant::PRODUCT_NAME::BASE}.app not found"
+            end
+                                     
+                                     if File.exist? ("#{productsRootPath}/#{Constant::PRODUCT_NAME::BASE}.app.app.dSYM")
+                                         File.rename("#{productsRootPath}/#{Constant::PRODUCT_NAME::BASE}.app.app.dSYM", "#{outputRootPath}/#{Constant::PRODUCT_NAME::BASE}.app.dSYM")
+            else
+                puts "#{Constant::PRODUCT_NAME::BASE}.app.dSYM not found"
+            end
+        end
+    end
+    
+    desc "Dev build"
+    lane :dev do |options|
+        
+        is_clean_carthage_cache = options[:is_clean_carthage_cache] == true ? true : false
+        updateAppVersion(options[:app_version])
+        if options[:is_update_dependencies] == true ? true : false
+            update_dependencies(isDebug: true, isCleanCache: is_clean_carthage_cache)
+        end
+        
+        if options[:is_export] == true ? true : false
+#            cocoapods(repo_update: true)
+            version = get_version_number(target: Constant::PRODUCT_NAME::BASE)
+            update_plist ({
+                          "NewRelicAppVersionString" => "#{version}-DEV",
+                          "NewRelicBuildTagString" => build_number,
+                          "Environment" => "Stage"
                           })
-
-          if options[:is_upload_to_hockeyapp] == true ? true : false
-              upload_to_hockeyapp_rc(ipa_path)
-          end
-      end
-  end
-
-  desc "DIQA build"
-  lane :diqa do |options|
-
-      is_clean_carthage_cache = options[:is_clean_carthage_cache] == true ? true : false
-      updateAppVersion(options[:app_version])
-      if options[:is_update_dependencies] == true ? true : false
-          update_dependencies(isCleanCache: is_clean_carthage_cache)
-      end
-
-      if options[:is_export] == true ? true : false
-          cocoapods(repo_update: true)
-          version = get_version_number(target: "ABC")
-          update_plist ({
-                        "NewRelicAppVersionString" => "#{version}",
-                        "NewRelicBuildTagString" => build_number,
-                        "Environment" => "Default"
-                        })
-          increment_build_number(build_number: build_number)
-          update_bundle_id "com.abcCompany.abcCompanyland"
-          code_sign_diqa
-          gym(configuration: "Release",
-              output_directory: output,
-              sdk: "#{Constant::SDK::IPHONE}",
-              archive_path: "#{output}/ABC",
-              clean:true,
-              derived_data_path: derivedDataPath,
-              export_options:{compileBitcode: true,
-              method: "app-store",
-              signingCertificate: "iPhone Distribution",
-              signingStyle: "manual",
-              stripSwiftSymbols: true,
-              teamID: "",
-              provisioningProfiles: {"#{Constant::ProvisioningProfile::DIQA::Identity::BASE}" => "#{Constant::ProvisioningProfile::DIQA::NAME::BASE}",
-                                     "#{Constant::ProvisioningProfile::DIQA::Identity::NOTIFICATION_CONTENT_EXTENSION}" => "#{Constant::ProvisioningProfile::DIQA::NAME::NOTIFICATION_CONTENT_EXTENSION}",
-                                     "#{Constant::ProvisioningProfile::DIQA::Identity::NOTIFICATION_SERVICE_EXTENSION}" => "#{Constant::ProvisioningProfile::DIQA::NAME::NOTIFICATION_SERVICE_EXTENSION}"}
-              })
-      end
-
-      adhoc_path = "#{output}/adhoc"
-      gym(configuration: "Release",
-              output_directory: adhoc_path,
-              sdk: "#{Constant::SDK::IPHONE}",
-              archive_path: "#{adhoc_path}/ABC",
-              clean:true,
-              derived_data_path: derivedDataPath,
-              export_options:{compileBitcode: true,
-              method: "ad-hoc",
-              signingCertificate: "iPhone Distribution",
-              signingStyle: "manual",
-              stripSwiftSymbols: true,
-              teamID: "",
-              provisioningProfiles: {"#{Constant::ProvisioningProfile::ADHOC::Identity::BASE}" => "#{Constant::ProvisioningProfile::ADHOC::NAME::BASE}",
-                                     "#{Constant::ProvisioningProfile::ADHOC::Identity::NOTIFICATION_CONTENT_EXTENSION}" => "#{Constant::ProvisioningProfile::ADHOC::NAME::NOTIFICATION_CONTENT_EXTENSION}",
-                                     "#{Constant::ProvisioningProfile::ADHOC::Identity::NOTIFICATION_SERVICE_EXTENSION}" => "#{Constant::ProvisioningProfile::ADHOC::NAME::NOTIFICATION_SERVICE_EXTENSION}"}
-              })
-
-  end
-
-  desc "Re-Sign builds"
-  lane :re_sign_build do |options|
-
-      path = options[:path]
-      type = options[:type]
-      if type == "dev"
-          update_app_extention_bundle_id(path,false)
-          re_sign_dev_build(path)
-
-      elsif type == "ad_hoc"
-          update_app_extention_bundle_id(path,true)
-          re_sign_ad_hoc_build(path)
-
-      elsif type == "ingestion"
-          update_ingestion_app_extention_bundle_id(path)
-          re_sign_ingestion_build(path)
-      else
-          puts "Please follow the parameters type:dev/ad_hoc path:path_to_the_ipa"
-      end
-  end
-
-  desc "Rome CI"
-  lane :rome_dev do |options|
-
-      rome_ci_dev
-  end
+            increment_build_number(build_number: build_number)
+            update_bundle_id "#{Constant::BundleID::BASE::DEV}"
+            update_project_team(teamid: "#{Constant::TeamID::DEV}")
+            code_sign_dev
+            fileName = "#{Constant::PRODUCT_NAME::BASE}#{version}(#{build_number})_dev"
+            ipa_path = gym(configuration: "Debug",
+            output_directory: output,
+            output_name: fileName,
+            sdk: "#{Constant::SDK::IPHONE}",
+            archive_path: "#{output}/#{fileName}",
+            clean:true,
+            derived_data_path: derivedDataPath,
+            include_bitcode: isCompileBitcode,
+            export_options:{compileBitcode: isCompileBitcode,
+                           method: "ad-hoc",
+                           signingCertificate: "iPhone Distribution",
+                           signingStyle: "manual",
+                           stripSwiftSymbols: true,
+                           teamID: Constant::TeamID::DEV,
+                           provisioningProfiles: {"#{Constant::BundleID::BASE::DEV}" => "#{Constant::ProvisioningProfile::BASE::NAME::DEV}"},
+                           thinning: "<#{is_thin}>"
+            })
+                                         
+            if options[:is_upload_to_hockeyapp] == true ? true : false
+                upload_to_hockeyapp_dev(ipa_path)
+            end
+        end
+    end
+    
+    desc "AppStore build"
+    lane :app_store do |options|
+        
+        is_clean_carthage_cache = options[:is_clean_carthage_cache] == true ? true : false
+        updateAppVersion(options[:app_version])
+        if options[:is_update_dependencies] == true ? true : false
+            update_dependencies(isCleanCache: is_clean_carthage_cache)
+        end
+        
+        new_folder_id = nil
+        if options[:is_export] == true ? true : false
+#            cocoapods(repo_update: true)
+            version = get_version_number(target: "#{Constant::PRODUCT_NAME::BASE}")
+            update_plist ({
+                          "NewRelicAppVersionString" => "#{version}",
+                          "NewRelicBuildTagString" => build_number,
+                          "Environment" => "Default"
+                          })
+#            clean_plist_release
+            increment_build_number(build_number: build_number)
+            update_bundle_id "#{Constant::BundleID::BASE}"
+            code_sign_diqa
+            appStoreFileName = "#{Constant::PRODUCT_NAME::BASE}_#{version}(#{build_number})_AppStore"
+            gym(configuration: "Release",
+             output_directory: output,
+                  output_name: appStoreFileName,
+                          sdk: "#{Constant::SDK::IPHONE}",
+                 archive_path: "#{output}/#{appStoreFileName}",
+                        clean:true,
+            derived_data_path: derivedDataPath,
+              include_bitcode: isCompileBitcode,
+               export_options:{
+                                compileBitcode: isCompileBitcode,
+                                method: "app-store",
+                                signingCertificate: "iPhone Distribution",
+                                signingStyle: "manual",
+                                stripSwiftSymbols: true,
+                                teamID: Constant::TeamID::PRODUCTION,
+                                provisioningProfiles: {"#{Constant::BundleID::BASE::PRODUCTION}" => "#{Constant::ProvisioningProfile::BASE::NAME::PRODUCTION}"},
+                              }
+                )
+                              
+            if options[:is_upload_to_googledrive] == true ? true : false
+                new_appStoreFileName = "#{Constant::PRODUCT_NAME::BASE}_#{version}\\\(#{build_number}\\\)_AppStore"
+                new_folder_id = upload_zip_build_to_google_drive("#{Constant::PRODUCT_NAME::BASE}_#{version}", "#{build_number}", [File.expand_path("../#{output}/#{new_appStoreFileName}.ipa"), File.expand_path("../#{output}/#{new_appStoreFileName}.app.dSYM.zip")], File.expand_path("../#{output}"), "#{Constant::PRODUCT_NAME::BASE}_#{version}-AppStore-Build-#{build_number}")
+            end
+                              
+        end
+    end
+    
+    desc "Re-Sign builds"
+    lane :re_sign_build do |options|
+        
+        path = options[:path]
+        type = options[:type]
+        if type == "dev"
+            update_app_extention_bundle_id(path,false)
+            re_sign_dev_build(path)
+            
+            elsif type == "ad_hoc"
+            update_app_extention_bundle_id(path,true)
+            re_sign_ad_hoc_build(path)
+            
+            elsif type == "ingestion"
+            update_ingestion_app_extention_bundle_id(path)
+            re_sign_ingestion_build(path)
+            else
+            puts "Please follow the parameters type:dev/ad_hoc path:path_to_the_ipa"
+        end
+    end
 end
 
 after_all do |lane, options|
@@ -392,7 +378,7 @@ def update_dependencies(isDebug: false, isCleanCache: false)
         if isCleanCache == true
             clean_carthage_cache
         end
-
+        
         carthage(command: "update",
                  use_ssh: false,
                  use_submodules: false,
@@ -409,93 +395,63 @@ end
 
 def code_sign_dev
     begin
-        disable_automatic_code_signing(team_id: "",
-                                       targets: ["ABC"],
+        disable_automatic_code_signing(team_id: "#{Constant::TeamID::DEV}",
+                                       targets: ["#{Constant::PRODUCT_NAME::BASE}"],
                                        code_sign_identity: "iPhone Distribution",
-                                       profile_name: "ABC HockeyApp Distribution",
-                                       profile_uuid: "",
-                                       bundle_identifier: "com.abcCompany.abcCompanyland.dev")
-    disable_automatic_code_signing(team_id: "",
-                                   targets: ["ABCPushContentExtension"],
-                                   code_sign_identity: "iPhone Distribution",
-                                   profile_name: "ABCNotificationContentProvision",
-                                   profile_uuid: "",
-                                   bundle_identifier: "com.abcCompany.abcCompanyland.dev.NotificationContentExtension")
-    disable_automatic_code_signing(team_id: "",
-                               targets: ["ABCPushServiceExtension"],
-                               code_sign_identity: "iPhone Distribution",
-                               profile_name: "ABCNotificationServiceProvision",
-                               profile_uuid: "",
-                               bundle_identifier: "com.abcCompany.abcCompanyland.dev.NotificationServiceExtension")
-    end
-end
-
-def code_sign_rc
-    begin
-        disable_automatic_code_signing(team_id: "",
-                                       targets: ["ABC"],
-                            code_sign_identity: "iPhone Distribution",
-                                  profile_name: "ABC HockeyApp Distribution",
-                                  profile_uuid: "",
-                             bundle_identifier: "com.abcCompany.abcCompanyland.dev")
-
-        disable_automatic_code_signing(team_id: "",
-                                       targets: ["ABCPushContentExtension"],
-                            code_sign_identity: "iPhone Distribution",
-                                  profile_name: "ABCNotificationContentProvision",
-                                  profile_uuid: "",
-                             bundle_identifier: "com.abcCompany.abcCompanyland.dev.NotificationContentExtension")
-        disable_automatic_code_signing(team_id: "",
-                                       targets: ["ABCPushServiceExtension"],
-                            code_sign_identity: "iPhone Distribution",
-                                  profile_name: "ABCNotificationServiceProvision",
-                                  profile_uuid: "",
-                             bundle_identifier: "com.abcCompany.abcCompanyland.dev.NotificationServiceExtension")
+                                       profile_name: "#{Constant::ProvisioningProfile::BASE::NAME::DEV}",
+                                       profile_uuid: "#{Constant::ProvisioningProfile::BASE::UUID::DEV}",
+                                       bundle_identifier: "#{Constant::BundleID::BASE::DEV}")
+#        disable_automatic_code_signing(team_id: "#{Constant::TeamID::DEV}",
+#                                       targets: ["PushContentExtension"],
+#                            code_sign_identity: "iPhone Distribution",
+#                                  profile_name: "NotificationContentProvision",
+#                                  profile_uuid: "bf96d346-9ade-469c-a96a-a249b1e24e58",
+#                             bundle_identifier: "com.wayne.FastfileTest.NotificationContentExtension")
+#        disable_automatic_code_signing(team_id: "86BD45EKTC",
+#                                       targets: ["PushServiceExtension"],
+#                            code_sign_identity: "iPhone Distribution",
+#                                  profile_name: "NotificationServiceProvision",
+#                                  profile_uuid: "cc4f2bb4-cc6f-442e-9183-5761ad4ec046",
+#                             bundle_identifier: "com.wayne.FastfileTest.NotificationServiceExtension")
     end
 end
 
 def code_sign_diqa
     begin
-        disable_automatic_code_signing(team_id: "",
-                                       targets: ["ABC"],
-                                       code_sign_identity: "iPhone Distribution",
-                                       profile_name: "abcCompanyland_app_store_distribution",
-                                       profile_uuid: "",
-                                       bundle_identifier: "com.abcCompany.abcCompanyland")
-        disable_automatic_code_signing(team_id: "",
-                                   targets: ["ABCPushContentExtension"],
-                                   code_sign_identity: "iPhone Distribution",
-                                   profile_name: "ABCNotificationContentExtension_app_store_distrib",
-                                   profile_uuid: "",
-                                   bundle_identifier: "com.abcCompany.abcCompanyland.NotificationContentExtension")
-        disable_automatic_code_signing(team_id: "",
-                               targets: ["ABCPushServiceExtension"],
-                               code_sign_identity: "iPhone Distribution",
-                               profile_name: "ABCNotificationServiceExtension_app_store_distrib",
-                               profile_uuid: "",
-                               bundle_identifier: "com.abcCompany.abcCompanyland.NotificationServiceExtension")
+        disable_automatic_code_signing(team_id: "#{Constant::TeamID::PRODUCTION}",
+                                       targets: ["#{Constant::PRODUCT_NAME::BASE}"],
+                                       code_sign_identity: "#{Constant::SingingIdentity::PRODUCTION}",
+                                       profile_name: "#{Constant::ProvisioningProfile::BASE::NAME::PRODUCTION}",
+                                       profile_uuid: "#{Constant::ProvisioningProfile::BASE::UUID::PRODUCTION}",
+                                       bundle_identifier: "#{Constant::BundleID::BASE::PRODUCTION}")
+#        disable_automatic_code_signing(team_id: "WZ62FEL3UG",
+#                                       targets: ["PushContentExtension"],
+#                            code_sign_identity: "iPhone Distribution",
+#                                  profile_name: "NotificationContentExtension_app_store_distrib",
+#                                  profile_uuid: "44e928ce-4032-4528-bdc2-27651ab0a141",
+#                             bundle_identifier: "com.NotificationContentExtension")
+#        disable_automatic_code_signing(team_id: "WZ62FEL3UG",
+#                                       targets: ["PushServiceExtension"],
+#                            code_sign_identity: "iPhone Distribution",
+#                                  profile_name: "NotificationServiceExtension_app_store_distrib",
+#                                  profile_uuid: "662053ac-e626-4fa2-9a8d-98151a73bbd4",
+#                             bundle_identifier: "com.NotificationServiceExtension")
     end
 end
 
 def updateAppVersion(version)
     begin
         if !version.nil?
-            update_plist ({
-                "CFBundleShortVersionString" => version
-            })
-            update_push_content_extension_plist ({
-                "CFBundleShortVersionString" => version
-            })
-            update_push_service_extension_plist ({
-                "CFBundleShortVersionString" => version
-            })
+            update_plist ({ "CFBundleShortVersionString" => version })
+#            update_push_content_extension_plist ({ "CFBundleShortVersionString" => version })
+#            update_push_service_extension_plist ({ "CFBundleShortVersionString" => version })
         end
     end
 end
 
 def update_push_content_extension_plist(keysValues)
     begin
-        update_info_plist(plist_path: "./ABCPushContentExtension/Info.plist",
+        update_info_plist(plist_path: "./PushContentExtension/Info.plist",
                           block: lambda { |plist|
                           keysValues.each do |key, value|
                           plist[key] = value
@@ -506,7 +462,7 @@ end
 
 def update_push_service_extension_plist(keysValues)
     begin
-        update_info_plist(plist_path: "./ABCPushServiceExtension/Info.plist",
+        update_info_plist(plist_path: "./PushServiceExtension/Info.plist",
                           block: lambda { |plist|
                           keysValues.each do |key, value|
                           plist[key] = value
@@ -524,120 +480,73 @@ def update_app_extention_bundle_id(path, isAdhoc)
             resign_content_bundle_id = "#{Constant::ProvisioningProfile::ADHOC::Identity::NOTIFICATION_CONTENT_EXTENSION}"
         end
         ipa_root_path = File.dirname("#{path}")
-        old_zip_path = "#{ipa_root_path}/ABC.zip"
+        old_zip_path = "#{ipa_root_path}/#{Constant::PRODUCT_NAME::BASE}.zip"
         payload_path = "#{ipa_root_path}/Payload"
         sh("mv #{path} #{old_zip_path}")
         unzip(file: "#{old_zip_path}",destination_path:"#{ipa_root_path}")
         sh("rm #{old_zip_path}")
-        ABCPushServiceExtensionPath = "#{ipa_root_path}/Payload/ABC.app/PlugIns/ABCPushServiceExtension.appex/Info.plist"
-        ABCPushContentExtensionPath = "#{ipa_root_path}/Payload/ABC.app/PlugIns/ABCPushContentExtension.appex/Info.plist"
-        sh("plutil -replace CFBundleIdentifier -string #{resign_service_bundle_id} #{ABCPushServiceExtensionPath}")
-        sh("plutil -replace CFBundleIdentifier -string #{resign_content_bundle_id} #{ABCPushContentExtensionPath}")
-        resign_zip_path = "#{ipa_root_path}/ABC"
+        pushServiceExtensionPath = "#{ipa_root_path}/Payload/#{Constant::PRODUCT_NAME::BASE}.app/PlugIns/#{Constant::PRODUCT_NAME::NOTIFICATION_SERVICE_EXTENSION}.appex/Info.plist"
+        pushContentExtensionPath = "#{ipa_root_path}/Payload/#{Constant::PRODUCT_NAME::BASE}.app/PlugIns/#{Constant::PRODUCT_NAME::NOTIFICATION_CONTENT_EXTENSION}.appex/Info.plist"
+        sh("plutil -replace CFBundleIdentifier -string #{resign_service_bundle_id} #{pushServiceExtensionPath}")
+        sh("plutil -replace CFBundleIdentifier -string #{resign_content_bundle_id} #{pushContentExtensionPath}")
+        resign_zip_path = "#{ipa_root_path}/#{Constant::PRODUCT_NAME::BASE}"
         zip(path: payload_path, output_path: resign_zip_path)
         sh("mv #{old_zip_path} #{path}")
         sh("rm -r #{payload_path}")
     end
 end
 
-def update_ingestion_app_extention_bundle_id(path)
+def update_dev_app_extention_bundle_id(path)
     begin
-        resign_service_bundle_id = "#{Constant::ProvisioningProfile::INGESTION::Identity::NOTIFICATION_SERVICE_EXTENSION}"
-        resign_content_bundle_id = "#{Constant::ProvisioningProfile::INGESTION::Identity::NOTIFICATION_CONTENT_EXTENSION}"
+        resign_service_bundle_id = "#{Constant::ProvisioningProfile::DEV::Identity::NOTIFICATION_SERVICE_EXTENSION}"
+        resign_content_bundle_id = "#{Constant::ProvisioningProfile::DEV::Identity::NOTIFICATION_CONTENT_EXTENSION}"
         ipa_root_path = File.dirname("#{path}")
         file = File.basename("#{path}")
-        old_zip_path = "#{ipa_root_path}/ABC.zip"
+        old_zip_path = "#{ipa_root_path}/#{Constant::PRODUCT_NAME::BASE}.zip"
         payload_path = "#{ipa_root_path}/Payload"
         sh("mv #{path} #{old_zip_path}")
         unzip(file: "#{old_zip_path}",destination_path:"#{ipa_root_path}")
         sh("rm #{old_zip_path}")
-        ABCPushServiceExtensionPath = "#{ipa_root_path}/Payload/ABC.app/PlugIns/ABCPushServiceExtension.appex/Info.plist"
-        ABCPushContentExtensionPath = "#{ipa_root_path}/Payload/ABC.app/PlugIns/ABCPushContentExtension.appex/Info.plist"
-        sh("plutil -replace CFBundleIdentifier -string #{resign_service_bundle_id} #{ABCPushServiceExtensionPath}")
-        sh("plutil -replace CFBundleIdentifier -string #{resign_content_bundle_id} #{ABCPushContentExtensionPath}")
-        resign_zip_path = "#{ipa_root_path}/ABC"
-        sh("cd #{ipa_root_path}; zip -r ABC.zip . *")
+        pushServiceExtensionPath = "#{ipa_root_path}/Payload/#{Constant::PRODUCT_NAME::BASE}.app/PlugIns/#{Constant::PRODUCT_NAME::NOTIFICATION_SERVICE_EXTENSION}.appex/Info.plist"
+        pushContentExtensionPath = "#{ipa_root_path}/Payload/#{Constant::PRODUCT_NAME::BASE}.app/PlugIns/#{Constant::PRODUCT_NAME::NOTIFICATION_CONTENT_EXTENSION}.appex/Info.plist"
+        sh("plutil -replace CFBundleIdentifier -string #{resign_service_bundle_id} #{pushServiceExtensionPath}")
+        sh("plutil -replace CFBundleIdentifier -string #{resign_content_bundle_id} #{pushContentExtensionPath}")
+        resign_zip_path = "#{ipa_root_path}/#{Constant::PRODUCT_NAME::BASE}"
+        sh("cd #{ipa_root_path}; zip -r #{Constant::PRODUCT_NAME::BASE}.zip . *")
         sh("mv #{old_zip_path} #{path}")
-
+        
         sh("cd #{ipa_root_path} && find . ! -name #{file} -type f -delete && find . ! -name #{file} -type d -delete")
     end
 end
 
-def build_adhoc_ipa(path)
-    begin
-
-        root_path = File.expand_path("../#{path}")
-        archived_path = "#{root_path}/ABC.xcarchive"
-        appstore_export_path = "#{root_path}/adhoc"
-
-        xcexport(
-            export_path: appstore_export_path,
-            archive_path: archived_path,
-
-            export_options_plist: {
-                method: 'ad-hoc',
-                compileBitcode: true,
-                provisioningProfiles: {
-                    "#{Constant::ProvisioningProfile::ADHOC::Identity::BASE}" => "#{Constant::ProvisioningProfile::ADHOC::NAME::BASE}",
-                    "#{Constant::ProvisioningProfile::ADHOC::Identity::NOTIFICATION_CONTENT_EXTENSION}" => "#{Constant::ProvisioningProfile::ADHOC::NAME::NOTIFICATION_CONTENT_EXTENSION}",
-                    "#{Constant::ProvisioningProfile::ADHOC::Identity::NOTIFICATION_SERVICE_EXTENSION}" => "#{Constant::ProvisioningProfile::ADHOC::NAME::NOTIFICATION_SERVICE_EXTENSION}"
-                }
-            }
-        )
-	end
-end
-
 def update_bundle_id(bundle_id)
     begin
-        update_app_identifier(xcodeproj: "MyProject.xcodeproj",
-                              plist_path: "./ABC/ABC-Info.plist",
+        update_app_identifier(xcodeproj: "#{Constant::PRODUCT_NAME::BASE}.xcodeproj",
+                              plist_path: "./#{Constant::PRODUCT_NAME::BASE}/Info.plist",
                               app_identifier: bundle_id)
     end
 end
 
 def upload_to_hockeyapp_dev(ipaPath)
     begin
-          if !File.exist? ("#{ipaPath}")
+        if !File.exist? ("#{ipaPath}")
             puts "#{ipaPath} not found"
             return
-          end
-
-          ipaRootPath = File.dirname("#{ipaPath}")
-          dsymPath = "#{ipaRootPath}/ABC.app.dSYM.zip"
-          if !File.exist? ("#{dsymPath}")
+        end
+        
+        ipaRootPath = File.dirname("#{ipaPath}")
+        dsymPath = "#{ipaRootPath}/#{Constant::PRODUCT_NAME::BASE}.app.dSYM.zip"
+        if !File.exist? ("#{dsymPath}")
             puts "#{dsymPath} not found"
             return
-          end
-
-          abcCompany_hockey(ipa: "#{ipaPath}",
-                        dsym: "#{dsymPath}",
-                        public_identifier: "",
-                        api_token: "",
-                        notify: "0",
-                        notes: "")
-    end
-end
-
-def upload_to_hockeyapp_rc(ipaPath)
-    begin
-          if !File.exist? ("#{ipaPath}")
-            puts "#{ipaPath} not found"
-            return
-          end
-
-          ipaRootPath = File.dirname("#{ipaPath}")
-          dsymPath = "#{ipaRootPath}/ABC.app.dSYM.zip"
-          if !File.exist? ("#{dsymPath}")
-            puts "#{dsymPath} not found"
-            return
-          end
-
-          abcCompany_hockey(ipa: "#{ipaPath}",
-                        dsym: "#{dsymPath}",
-                        public_identifier: "",
-                        api_token: "",
-                        notify: "0",
-                        notes: "")
+        end
+        
+        hockey(ipa: "#{ipaPath}",
+               dsym: "#{dsymPath}",
+               public_identifier: "47527881a6b93bac1e6f25e71ccc6e77",
+               api_token: "47f28b429a944cb8bb4d96dba3d79bc9",
+               notify: "0",
+               notes: "")
     end
 end
 
@@ -675,31 +584,12 @@ def re_sign_ingestion_build(path)
            })
 end
 
-def rome_ci_dev
+def clean_plist_release
     begin
-        carthage(command: "update",
-                 use_ssh: false,
-                 use_submodules: false,
-                 use_binaries: true,
-                 no_build: true,
-                 no_skip_current: false,
-                 verbose: false,
-                 platform: "iOS",
-                 new_resolver: true,
-                 configuration: "Debug",
-                 cache_builds: true)
-        sh("cd ../; rome download --platform iOS")
-        carthage(command: "bootstrap",
-                 use_ssh: false,
-                 use_submodules: false,
-                 use_binaries: true,
-                 no_build: false,
-                 no_skip_current: false,
-                 verbose: false,
-                 platform: "iOS",
-                 new_resolver: true,
-                 configuration: "Debug",
-                 cache_builds: true)
-        sh("cd ../; rome list --missing --platform iOS | awk '{print $1}' | xargs rome upload --platform iOS")
+        delete_plist_all_value_except("./Resources/Configurations/Services.plist", ["default"])
+        delete_plist_by_path_strings("./Resources/Configurations/3rdPartyConfiguration.plist", ["BaiduAPIKey/com.land.dev", "JPushAppKey/com.land.dev", "AMapAppKey/com.land.dev"])
+        delete_plist_by_path_strings("./Info.plist", ["NSAppTransportSecurity/NSExceptionDomains/6045a845dbd4420883661e56c85c99af.com", "NSAppTransportSecurity/NSExceptionDomains/c00.adobe.com", "NSAppTransportSecurity/NSExceptionDomains/go.com", "NSAppTransportSecurity/NSExceptionDomains/lt01.service-internal.com", "NSAppTransportSecurity/NSExceptionDomains/stage.service-internal.com", "NSAppTransportSecurity/NSExceptionDomains/starwave.com",
+                                     "NSAppTransportSecurity/NSExceptionDomains/service-internal-hkdl-cn-prod.starwave.com","NSAppTransportSecurity/NSExceptionDomains/alipay.com","NSAppTransportSecurity/NSExceptionDomains/alipayobjects.com"])
     end
 end
+

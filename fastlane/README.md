@@ -45,6 +45,11 @@ Delete all keys values that doesn't matched in a Plist test.
 fastlane delete_paths_test
 ```
 Delete paths in plist test.
+### shdr_monkey_test
+```
+fastlane shdr_monkey_test
+```
+SHDR Monkey Test
 
 ----
 
@@ -54,6 +59,11 @@ Delete paths in plist test.
 fastlane ios syntax_test
 ```
 
+### ios shdr_help
+```
+fastlane ios shdr_help
+```
+Help to understand usage of SHDR iOS lanes.
 ### ios simulator
 ```
 fastlane ios simulator
@@ -64,16 +74,11 @@ Simulator build
 fastlane ios dev
 ```
 Dev build
-### ios rc
+### ios app_store
 ```
-fastlane ios rc
+fastlane ios app_store
 ```
-RC build
-### ios diqa
-```
-fastlane ios diqa
-```
-DIQA build
+AppStore build
 ### ios re_sign_build
 ```
 fastlane ios re_sign_build
@@ -84,6 +89,11 @@ Re-Sign builds
 fastlane ios rome_dev
 ```
 Rome CI
+### ios upload_files_to_google_drive
+```
+fastlane ios upload_files_to_google_drive
+```
+Upload files to GoogleDrive
 
 ----
 
